@@ -12,7 +12,6 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 )
 
 var (
@@ -22,9 +21,10 @@ var (
 )
 
 func setupTestDB() (*pgx.Conn, error) {
-	db, err := repository.NewPostgresDB(viper.GetString("environment.TEST_DATABASE_URL"))
+	dsn := "postgres://postgres:229847@test_db:5432/testdb?sslmode=disable"
+	db, err := repository.NewPostgresDB(dsn)
 	if err != nil {
-		logrus.Print(viper.GetString("environment.TEST_DATABASE_URL"))
+		logrus.Fatalf("Failed to set up test DB: %v", err)
 		return nil, err
 	}
 	return db, nil
