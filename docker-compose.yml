@@ -1,0 +1,39 @@
+# docker-compose.yml
+
+services:
+  app:
+    restart: always
+    build: .
+    ports:
+      - "8443:8443"
+    environment:
+       DATABASE_URL: postgres://postgres:229847@db:5432/booking?sslmode=disable 
+       TEST_DATABASE_URL: postgres://postgres:229847@test_db:5432/testdb?sslmode=disable" 
+    depends_on:
+      - db
+      - test_db
+
+  db:
+    restart: always
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 229847
+      POSTGRES_DB: booking
+    ports: 
+     - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  test_db:
+    restart: always
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 229847
+      POSTGRES_DB: testdb
+    ports: 
+     - 5433:5432
+
+volumes:
+  db_data:
