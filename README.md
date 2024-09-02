@@ -24,3 +24,13 @@
 
     Команда: make test
 
+    ВЫВОД: 
+    TestCreateReservation_Success - добавляет одну запись в таблицу в тестовой бд и выводит 
+
+    TestCreateReservationWithConflict_Success - пытается добавить две пересекающие записи, добавляется только первый и выводит все записи в таблице 
+
+    TestCreateReservation_ConcurrentRequests - попытается добавить несколько одинаковых записей в одно время 
+
+    код теста в pkg/service/test 
+
+

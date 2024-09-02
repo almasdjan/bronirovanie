@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	db             *pgx.Conn
 	repo           *repository.Repository
 	bookingService *service.BookingService
 )
@@ -30,7 +29,7 @@ func setupTestDB() (*pgx.Conn, error) {
 	return db, nil
 }
 
-func createTables() error {
+func createTables(db *pgx.Conn) error {
 	stmt := `
         CREATE TABLE IF NOT EXISTS reservations (
             id SERIAL PRIMARY KEY,
@@ -40,7 +39,11 @@ func createTables() error {
         );
     `
 	_, err := db.Exec(context.Background(), stmt)
-	return err
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func TestMain(m *testing.M) {
@@ -54,14 +57,14 @@ func TestMain(m *testing.M) {
 	repo = repository.NewRepository(db)
 	bookingService = service.NewBookingService(repo)
 
-	err = createTables()
+	err = createTables(db)
 	if err != nil {
 		logrus.Fatalf("Failed to create tables: %v", err)
 	}
 
 	code := m.Run()
 
-	if err := clearTestDatabase(); err != nil {
+	if err := clearTestDatabase(db); err != nil {
 		logrus.Fatalf("Failed to clear test database: %v", err)
 	}
 
@@ -163,7 +166,7 @@ func TestCreateReservation_ConcurrentRequests(t *testing.T) {
 	}
 }
 
-func clearTestDatabase() error {
+func clearTestDatabase(db *pgx.Conn) error {
 	_, err := db.Exec(context.Background(), `TRUNCATE TABLE reservations`)
 	return err
 }
